@@ -1,11 +1,11 @@
-[
+Example:
+discard [
 	name program -> [
 		let run -> [
 			let o1 -> app 
 			@.o1.n
 		]
 	]
-
 	name app -> [
 		let x -> [ 0, 1, 2, 3 ]
 		let y -> 13
@@ -15,4 +15,54 @@
 		]
 		spawn
 	]
-]
+	lock program
+	program.run []
+	unlock program
+	program.run <- [ program.run, program.run, 0]
+	lock program
+	program.run []
+] []
+
+Grammar:
+
+Null	   := []
+Unit	   := [ Expression ]
+Sequence   := [ Expression, Expression, ... ]
+List       := Null ||
+			  Unit ||
+			  Sequence
+Expression := List ||
+			  List List ||
+			  name Identifier -> List ||
+			  let Identifier -> List ||
+			  QualifiedIdentifier ||
+			  QualifiedIdentifier List ||
+			  lock QualifiedIdentifier ||
+			  unlock QualifiedIdentifier ||
+			  spawn ||
+			  1stLevelOperation ||
+			  2ndLevelOperation ||
+			  print ||
+			  QualifiedIdentifier <- Expression
+
+1stLevelOperation := [2ndLevelOperation] * [2ndLevelOperation] ||
+					 Expression * [2ndLevelOperation] ||
+					 [2ndLevelOperation] * Expression
+2ndLevelOperation := Expression + Expression ||
+					 Expression - Expression ||
+					 Expression | Expression
+
+QualifiedIdentifer := Identifier ||
+					  @ ||
+					  ^ ||
+					  QualifiedIdentifier.Identifier
+
+LR(1) Grammar:
+
+R000. Program := Expression (EOF)
+R001. Expression := Null
+R002. Expression := Unit
+R003. Expression := Sequence
+R004. Null := []
+R005. Unit := [Expression]
+R006. 

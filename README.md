@@ -1,4 +1,4 @@
 endo
 ====
 
-En language JIT compiler
+En language interpreter and JIT compiler
